@@ -1,0 +1,91 @@
+version: '3'
+
+services:
+
+  vtiger:
+    image: javanile/vtiger-dev:7.1.0
+    environment:
+      - VT_ENV=dev
+      - VT_DEBUG=true
+      - MYSQL_HOST=mysql
+      - MYSQL_DATABASE=vtiger
+      - MYSQL_ROOT_PASSWORD=secret
+      - COMPOSER_DISABLE_XDEBUG_WARN=1
+    volumes:
+      - .:/app
+      - ./logs:/var/lib/vtiger/logs
+      - ./modules/Composer:/var/www/html/modules/Composer
+      - vtiger:/var/lib/vtiger
+    ports:
+      - 8080:80
+    links:
+      - mysql
+      - adminer
+      - xdebug
+
+  mysql:
+    image: javanile/mysql:5.7.28
+    command: --sql-mode= --character-set-server=utf8 --collation-server=utf8_general_ci
+    environment:
+      - MYSQL_DATABASE=vtiger
+      - MYSQL_ROOT_PASSWORD=secret
+    volumes:
+      - ./dataset:/dataset:rw
+      - mysql:/var/lib/mysql:rw
+
+  adminer:
+    image: javanile/adminer
+    ports:
+      - 8081:80
+    environment:
+      - MYSQL_DATABASE=vtiger
+      - MYSQL_ROOT_PASSWORD=secret
+    links:
+      - mysql
+
+  xdebug:
+    image: javanile/xdebug
+    cap_add: [ 'NET_ADMIN', 'NET_RAW' ]
+    restart: on-failure
+
+  vtiger-test:
+    image: javanile/vtiger-dev:7.1.0
+    environment:
+      - MYSQL_HOST=mysql-test
+      - MYSQL_DATABASE=vtiger
+      - MYSQL_ROOT_PASSWORD=secret
+      - COMPOSER_DISABLE_XDEBUG_WARN=1
+    volumes:
+      - ./tests/logs:/var/lib/vtiger/logs
+      - vtiger-test:/var/lib/vtiger
+    ports:
+      - 8090:80
+    links:
+      - mysql-test
+      - adminer-test
+
+  mysql-test:
+    image: javanile/mysql:5.7.28
+    command: --sql-mode= --character-set-server=utf8 --collation-server=utf8_general_ci
+    environment:
+      - MYSQL_DATABASE=vtiger
+      - MYSQL_ROOT_PASSWORD=secret
+    volumes:
+      - mysql-test:/var/lib/mysql:rw
+
+  adminer-test:
+    image: javanile/adminer
+    ports:
+      - 8091:80
+    environment:
+      - MYSQL_HOST=mysql-test
+      - MYSQL_DATABASE=vtiger
+      - MYSQL_ROOT_PASSWORD=secret
+    links:
+      - mysql-test
+
+volumes:
+  vtiger:
+  mysql:
+  vtiger-test:
+  mysql-test:

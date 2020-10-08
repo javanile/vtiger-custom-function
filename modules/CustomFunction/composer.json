@@ -1,0 +1,10 @@
+{
+    "require": {
+        "javanile/vtiger-psr4": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Javanile\\VtigerCustomFunction\\": "src/"
+        }
+    }
+}

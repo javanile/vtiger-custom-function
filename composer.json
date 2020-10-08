@@ -1,0 +1,14 @@
+{
+    "name": "javanile/vtiger-composer",
+    "config": {
+        "vendor-dir": "modules/testing"
+    },
+    "autoload": {
+        "psr-4": {
+            "\\Cavallo\\Cane\\": "modules/Canevallo"
+        }
+    },
+    "require": {
+        "javanile/vtiger-composer": "^0.0.1"
+    }
+}
